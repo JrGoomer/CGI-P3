@@ -1,8 +1,8 @@
 var gl, program;
 
-var instances=[];
+var instances;
 
-
+var modelView;
 var mModelLoc;
 var mView, mProjection;
 
@@ -15,7 +15,7 @@ window.onload = function init() {
     
     // Configure WebGL
     gl.viewport(0,0,canvas.width, canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.5, 0.5, 0.5, 1.0);
 
     gl.enable(gl.DEPTH_TEST);
     
@@ -32,106 +32,51 @@ window.onload = function init() {
     cylinderInit(gl);
     torusInit(gl);
 
-    document.getElementById("new_cube").onclick=function() {
-        instances.push({t: mat4(), p: cubeDrawWireFrame});
-        reset_sliders();
-    };
-
-    document.getElementById("new_parabolic").onclick=function() {
-        instances.push({t: mat4(), p: parabolicDrawWireFrame});
-        reset_sliders();
-    };
+    if(instances==undefined)
+        instances = {t: mat4(), p: cubeDrawWireFrame};
 
     document.getElementById("new_cube").onclick=function() {
-        instances.push({t: mat4(), p: cubeDrawWireFrame});
-        reset_sliders();
+        instances = {t: mat4(), p: cubeDrawWireFrame};
     };
 
     document.getElementById("new_sphere").onclick=function() {
-        instances.push({t: mat4(), p: sphereDrawWireFrame});
-        reset_sliders();
+        instances = {t: mat4(), p: sphereDrawWireFrame};
     };
 
     document.getElementById("new_cylinder").onclick=function() {
-        instances.push({t: mat4(), p: cylinderDrawWireFrame});
-        reset_sliders();
+        instances = {t: mat4(), p: cylinderDrawWireFrame};
     };
 
     document.getElementById("new_torus").onclick=function() {
-        instances.push({t: mat4(), p: torusDrawWireFrame});
-        reset_sliders();
-    };
-
-    document.getElementById("reset_current").onclick=function() {
-        instances[instances.length-1].t = mat4();
-        reset_sliders();
+        instances = {t: mat4(), p: torusDrawWireFrame};
     };
 
     document.getElementById("reset_all").onclick=function() {
-        instances = [];
-        reset_sliders();
+        instances = undefined;
     };
 
-    document.getElementById("tx").oninput = update_ctm;
-    document.getElementById("ty").oninput = update_ctm;
-    document.getElementById("tz").oninput = update_ctm;
-    document.getElementById("rx").oninput = update_ctm;
-    document.getElementById("ry").oninput = update_ctm;
-    document.getElementById("rz").oninput = update_ctm;
-    document.getElementById("sx").oninput = update_ctm;
-    document.getElementById("sy").oninput = update_ctm;
-    document.getElementById("sz").oninput = update_ctm;
-
-    document.getElementById("l").oninput = update_oblique;
-    document.getElementById("alpha").oninput = update_oblique;
-
+    //document.getElementById("l").oninput = update_oblique;
+    //document.getElementById("alpha").oninput = update_oblique;
+    drawPrimitive(0, 1, program);
     render();
 }
 
+var drawFuncs = [
+    [cubeDrawWireFrame, sphereDrawWireFrame],
+    [cubeDrawFilled, sphereDrawFilled]
+];
 
-function update_ctm()
-{
-    if(instances.length==0) return;
-    
-    let tx = parseFloat(document.getElementById('tx').value);
-    let ty = parseFloat(document.getElementById('ty').value);
-    let tz = parseFloat(document.getElementById('tz').value);
-    let rx = parseFloat(document.getElementById('rx').value);
-    let ry = parseFloat(document.getElementById('ry').value);
-    let rz = parseFloat(document.getElementById('rz').value);
-    let sx = parseFloat(document.getElementById('sx').value);
-    let sy = parseFloat(document.getElementById('sy').value);
-    let sz = parseFloat(document.getElementById('sz').value);
-
-    let m = mult(translate([tx, ty, tz]), 
-          mult(rotateZ(rz), 
-          mult(rotateY(ry),
-          mult(rotateX(rx),
-          scalem([sx,sy,sz])))));
-    instances[instances.length-1].t = m;
+function drawPrimitive(obj, mode, program) {
+    //gl.uniformMatrix4fv(mModelLoc, false, flatten(modelView));
+    //gl.uniformMatrix4fv(mviewLoc, false, flatten(modelView));
+    drawFuncs[mode][obj](gl, program);
 }
+
 
 function update_oblique() 
 {
     l = parseFloat(document.getElementById('l').value);
     alpha = parseFloat(document.getElementById('alpha').value);
-}
-
-function reset_sliders() {
-    update_sliders([0,0,0], [0,0,0], [1,1,1]);
-}
-
-function update_sliders(t, r, s)
-{
-    document.getElementById("tx").value = t[0];
-    document.getElementById("ty").value = t[1];
-    document.getElementById("tz").value = t[2];
-    document.getElementById("rx").value = r[0];
-    document.getElementById("ry").value = r[1];
-    document.getElementById("rz").value = r[2];
-    document.getElementById("sx").value = s[0];
-    document.getElementById("sy").value = s[1];
-    document.getElementById("sz").value = s[2];
 }
 
 function buildMobl(l, alpha) { 
@@ -156,12 +101,14 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Draw stored primitives
-    for( const i of instances) {
-        let t = i.t;
-        let p = i.p;
+    if(instances!=undefined){
+        let p = instances.p;
 
-        gl.uniformMatrix4fv(mModelLoc, false, flatten(t));
+        gl.uniformMatrix4fv(mModelLoc, false, flatten(instances.t));
         p(gl, program);
     }
+
+
+    modelView = lookAt([0,0,0], [0,0,0], [0,1,0]);
     window.requestAnimationFrame(render);
 }
