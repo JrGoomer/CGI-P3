@@ -1,12 +1,22 @@
 var gl, program;
 
+const WIRED=0;
+const NOT_WIRED=1;
 var instances;
+var mode=WIRED;
 
 var modelView;
 var mModelLoc;
-var mView, mProjection;
+var mView;
+
+var aspect = 2;
 
 var alpha = 45, l=1;
+
+var drawFuncs = [
+    [cubeDrawWireFrame, sphereDrawWireFrame, cylinderDrawWireFrame, torusDrawWireFrame],
+    [cubeDrawFilled, sphereDrawFilled, cylinderDrawFilled, torusDrawFilled]
+];
 
 window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
@@ -32,46 +42,69 @@ window.onload = function init() {
     cylinderInit(gl);
     torusInit(gl);
 
-    if(instances==undefined)
-        instances = {t: mat4(), p: cubeDrawWireFrame};
 
+    if(instances==undefined)
+        drawPrimitive(0);
+        
     document.getElementById("new_cube").onclick=function() {
-        instances = {t: mat4(), p: cubeDrawWireFrame};
+        drawPrimitive(0);
     };
 
     document.getElementById("new_sphere").onclick=function() {
-        instances = {t: mat4(), p: sphereDrawWireFrame};
+        drawPrimitive(1);
     };
 
     document.getElementById("new_cylinder").onclick=function() {
-        instances = {t: mat4(), p: cylinderDrawWireFrame};
+        drawPrimitive(2);
     };
 
     document.getElementById("new_torus").onclick=function() {
-        instances = {t: mat4(), p: torusDrawWireFrame};
+        drawPrimitive(3);
     };
 
     document.getElementById("reset_all").onclick=function() {
         instances = undefined;
     };
 
+
+
+    document.onkeydown = function(event) {
+        switch(event.key) {
+            case 'w':
+                mode = WIRED;
+                break;     
+            case 's':
+                mode = NOT_WIRED;
+                break;
+        }   
+    }
+
+    window.addEventListener("wheel", event => {
+        const delta = Math.sign(event.deltaY);
+        if(delta>0)
+            aspect++;
+        else if(aspect>1)
+            aspect--;
+    });
+
     //document.getElementById("l").oninput = update_oblique;
     //document.getElementById("alpha").oninput = update_oblique;
-    drawPrimitive(0, 1, program);
+    //drawPrimitive(0, 1, program);
     render();
 }
 
-var drawFuncs = [
-    [cubeDrawWireFrame, sphereDrawWireFrame],
-    [cubeDrawFilled, sphereDrawFilled]
-];
+function drawPrimitive(primitive){
+    instances = {t: mat4(), p: drawFuncs[mode][primitive]};
+}
 
+
+/*
 function drawPrimitive(obj, mode, program) {
     //gl.uniformMatrix4fv(mModelLoc, false, flatten(modelView));
     //gl.uniformMatrix4fv(mviewLoc, false, flatten(modelView));
     drawFuncs[mode][obj](gl, program);
 }
-
+*/
 
 function update_oblique() 
 {
@@ -93,10 +126,11 @@ function buildMobl(l, alpha) {
 function render() {
 
     mView = mat4();
-    mProjection = buildMobl(l, alpha);
+
+    var projection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
-    gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
+    gl.uniformMatrix4fv(mProjectionLoc, false, flatten(projection));
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
