@@ -1,13 +1,17 @@
 var gl, program;
 
+const CUBE=0,SPHERE=1,CYLINDER=2, TORUS=3;
 const WIRED=0;
 const NOT_WIRED=1;
 var instances;
 var mode=WIRED;
+var primitive=CUBE;
+
 
 var modelView;
 var mModelLoc;
 var mView;
+
 
 var aspect = 2;
 
@@ -42,30 +46,25 @@ window.onload = function init() {
     cylinderInit(gl);
     torusInit(gl);
 
-
-    if(instances==undefined)
-        drawPrimitive(0);
-        
     document.getElementById("new_cube").onclick=function() {
-        drawPrimitive(0);
+        primitive = CUBE;
     };
 
     document.getElementById("new_sphere").onclick=function() {
-        drawPrimitive(1);
+        primitive = SPHERE;
     };
 
     document.getElementById("new_cylinder").onclick=function() {
-        drawPrimitive(2);
+        primitive = CYLINDER;
     };
 
     document.getElementById("new_torus").onclick=function() {
-        drawPrimitive(3);
+        primitive = TORUS;
     };
 
     document.getElementById("reset_all").onclick=function() {
         instances = undefined;
     };
-
 
 
     document.onkeydown = function(event) {
@@ -106,27 +105,13 @@ function drawPrimitive(obj, mode, program) {
 }
 */
 
-function update_oblique() 
-{
-    l = parseFloat(document.getElementById('l').value);
-    alpha = parseFloat(document.getElementById('alpha').value);
-}
-
-function buildMobl(l, alpha) { 
-    let cosa = Math.cos(alpha * Math.PI / 180.0);
-    let sina = Math.sin(alpha * Math.PI / 180.0);
-
-    return mat4( 
-        [1, 0, -l * cosa, 0],
-        [0, 1, -l * sina, 0],
-        [0, 0, -1, 0],
-        [0, 0, 0, 1])
-}
 
 function render() {
 
     mView = mat4();
 
+    console.log(mode);
+    drawPrimitive(primitive);
     var projection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
