@@ -7,15 +7,20 @@ var instances;
 var mode=WIRED;
 var primitive=CUBE;
 
-
-var modelView;
 var mModelLoc;
 var mView;
 
+var eye = [1,1,1];
+var at = [0,0,0];
+var up = [0,0,1];
 
+
+var view = lookAt(eye, at, up);
 var aspect = 2;
 
 var alpha = 45, l=1;
+
+var mine=1;
 
 var drawFuncs = [
     [cubeDrawWireFrame, sphereDrawWireFrame, cylinderDrawWireFrame, torusDrawWireFrame],
@@ -66,6 +71,47 @@ window.onload = function init() {
         instances = undefined;
     };
 
+    document.getElementById("principal").onclick=function() {  
+        eye = [1,0,0];
+        at = [0,0,0]; 
+        up = [0,1,0];  
+    };
+
+    document.getElementById("planta").onclick=function() {  
+        eye = [0,0,0];
+        at = [0,0,0]; 
+        up = [0,1,0];  
+    };
+
+    document.getElementById("direito").onclick=function() {  
+        eye = [0,1,0];
+        at = [0,0,0];
+        up = [0,0,1]; 
+    };
+
+
+    document.getElementById("axonometrica").onclick=function() {
+        console.log("A");
+    };
+
+    document.getElementById("perspetiva").onclick=function() {
+        console.log("A");
+    };
+
+    $("[value='ortogonal'").click(function() {
+        $(".axonometrica").hide()
+        $(".ortogonal").show()
+    });
+
+    $("[value='axonometrica'").click(function() {
+        $(".ortogonal").hide()
+        $(".axonometrica").show()
+    });
+
+    $("[value='perspetiva'").click(function() {
+        $(".ortogonal").hide()
+        $(".axonometrica").hide()
+    });
 
     document.onkeydown = function(event) {
         switch(event.key) {
@@ -93,6 +139,7 @@ window.onload = function init() {
 }
 
 function drawPrimitive(primitive){
+    gl.uniformMatrix4fv(mviewLoc, false, flatten(view));
     instances = {t: mat4(), p: drawFuncs[mode][primitive]};
 }
 
@@ -108,12 +155,11 @@ function drawPrimitive(obj, mode, program) {
 
 function render() {
 
-    mView = mat4();
-
-    console.log(mode);
     drawPrimitive(primitive);
-    var projection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
 
+    var projection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
+    //mView = lookAt(eye, at, up);
+    mView = perspective(5,4,0,20);
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(projection));
 
@@ -127,7 +173,5 @@ function render() {
         p(gl, program);
     }
 
-
-    modelView = lookAt([0,0,0], [0,0,0], [0,1,0]);
     window.requestAnimationFrame(render);
 }

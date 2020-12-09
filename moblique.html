@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+.ortogonal {
+    display: none;
+}
+.axonometrica {
+    display: none;
+}
+</style>
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
 attribute vec4 vNormal;
@@ -29,6 +37,7 @@ void main() {
 <script type="text/javascript" src="../Common/cylinder.js"></script>
 <script type="text/javascript" src="../Common/torus.js"></script>
 <script type="text/javascript" src="moblique.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 </head>
 <body>
     <div>
@@ -39,9 +48,42 @@ void main() {
     <div>
         <button id="new_cube">New Cube</button>
         <button id="new_sphere">New Sphere</button>
-        <button id="new_cylinder">New Cylinder</button>
+        <button id="new_cylinder">New cylinder</button>
         <button id="new_torus">New Torus</button>
         <button id="reset_all">reset all</button>
-</div>
+    </div>
+    <div>
+        <form>
+            <input type="radio" id="ortogonal" name="projection" value="ortogonal">
+            <label for="ortogonal">Ortogonal</label><br>
+            <input type="radio" id="axonometrica" name="projection" value="axonometrica">
+            <label for="axonometrica">Axonométrica</label><br>
+            <input type="radio" id="perspetiva" name="projection" value='perspetiva'>
+            <label for="perspetiva">Perspetiva</label>
+          </form>
+    </div>
+    <br>
+    <div class="ortogonal">
+        <form>
+            <input type="radio" id="principal" name="projection">
+            <label for="principal">Principal</label>
+            <input type="radio" id="planta" name="projection">
+            <label for="planta">Planta</label>
+            <input type="radio" id="direito" name="projection">
+            <label for="direito">Alçado lateral direito</label>
+          </form>
+    </div>
+    <div class="axonometrica">
+        <form>
+            <input type="radio" id="isometrica" name="projection">
+            <label for="isometrica">Isometrica</label>
+            <input type="radio" id="dimetrica" name="projection">
+            <label for="dimetrica">Dimétrica</label>
+            <input type="radio" id="trimetrica" name="projection">
+            <label for="trimetrica">Trimétrica</label>
+            <input type="radio" id="livre" name="projection">
+            <label for="livre">Livre</label>
+          </form>
+    </div>
 </body>
 </html>
