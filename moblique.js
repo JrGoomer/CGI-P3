@@ -14,6 +14,7 @@ var eye = [1,1,1];
 var at = [0,0,0];
 var up = [0,0,1];
 
+var zbuffer=false,backCulling=false;
 
 var view = lookAt(eye, at, up);
 var aspect = 2;
@@ -36,7 +37,6 @@ window.onload = function init() {
     gl.viewport(0,0,canvas.width, canvas.height);
     gl.clearColor(0.5, 0.5, 0.5, 1.0);
 
-    gl.enable(gl.DEPTH_TEST);
     
     // Load shaders and initialize attribute buffers
     program = initShaders(gl, "vertex-shader", "fragment-shader");
@@ -121,6 +121,27 @@ window.onload = function init() {
             case 's':
                 mode = NOT_WIRED;
                 break;
+            case 'z':
+                if(!zbuffer){
+                    gl.enable(gl.DEPTH_TEST);
+                    zbuffer=true;
+                }
+                else{
+                    gl.disable(gl.DEPTH_TEST);
+                    zbuffer=false;
+                }
+                break;
+            case 'b':
+                if(!backCulling){
+                    gl.enable(gl.CULL_FACE);
+                    gl.cullFace(gl.FRONT);
+                    backCulling=true;
+                }
+                else{
+                    gl.disable(gl.CULL_FACE);
+                    backCulling=false;
+                }
+                break;
         }   
     }
 
@@ -158,8 +179,8 @@ function render() {
     drawPrimitive(primitive);
 
     var projection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
-    //mView = lookAt(eye, at, up);
-    mView = perspective(5,4,0,20);
+    mView = lookAt(eye, at, up);
+    //mView = perspective(5,4,0,20);
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(projection));
 

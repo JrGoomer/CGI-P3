@@ -26,7 +26,7 @@ precision mediump float;
 varying vec4 fNormal;
 void main() {
     //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    gl_FragColor =fNormal;
+    gl_FragColor = abs(fNormal);
 }
 </script>
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
