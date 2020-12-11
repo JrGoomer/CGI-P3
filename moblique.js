@@ -8,20 +8,21 @@ var mode=WIRED;
 var primitive=CUBE;
 
 var mModelLoc;
-var mView;
+var mView,mProjection;
 
-var eye = [1,1,1];
+var eye = [-1,1,1];
 var at = [0,0,0];
-var up = [0,0,1];
+var up = [0,1,0]; 
 
 var zbuffer=false,backCulling=false;
 
-var view = lookAt(eye, at, up);
 var aspect = 2;
 
 var alpha = 45, l=1;
 
 var mine=1;
+
+//var perspective = "o";
 
 var drawFuncs = [
     [cubeDrawWireFrame, sphereDrawWireFrame, cylinderDrawWireFrame, torusDrawWireFrame],
@@ -68,35 +69,42 @@ window.onload = function init() {
     };
 
     document.getElementById("reset_all").onclick=function() {
-        instances = undefined;
-    };
-
-    document.getElementById("principal").onclick=function() {  
-        eye = [1,0,0];
-        at = [0,0,0]; 
-        up = [0,1,0];  
-    };
-
-    document.getElementById("planta").onclick=function() {  
-        eye = [0,0,0];
-        at = [0,0,0]; 
-        up = [0,1,0];  
-    };
-
-    document.getElementById("direito").onclick=function() {  
-        eye = [0,1,0];
+        instances = undefined;       
+        eye = [1,1,1];
         at = [0,0,0];
         up = [0,0,1]; 
     };
 
 
-    document.getElementById("axonometrica").onclick=function() {
-        console.log("A");
+    document.getElementById("principal").onclick=function() {  
+        eye = [0,0,0];
+        at = [0,0,0]; 
+        up = [0,1,0];  
     };
 
-    document.getElementById("perspetiva").onclick=function() {
-        console.log("A");
+    document.getElementById("planta").onclick=function() {  
+        eye = [0,1,0];
+        at = [0,0,0];
+        up = [0,0,1]; 
     };
+
+    document.getElementById("direito").onclick=function() {  
+        eye = [1,0,0];
+        at = [0,0,0];
+        up = [0,0,1]; 
+    };
+
+
+    document.getElementById("isometrica").onclick=function() {
+        isometria();
+    };
+
+    document.getElementById("dimetrica").onclick=function() {
+        dimetria();
+    };
+   
+
+    
 
     $("[value='ortogonal'").click(function() {
         $(".axonometrica").hide()
@@ -113,12 +121,14 @@ window.onload = function init() {
         $(".axonometrica").hide()
     });
 
+    
+
     document.onkeydown = function(event) {
         switch(event.key) {
             case 'w':
                 mode = WIRED;
                 break;     
-            case 's':
+            case 'f':
                 mode = NOT_WIRED;
                 break;
             case 'z':
@@ -134,7 +144,6 @@ window.onload = function init() {
             case 'b':
                 if(!backCulling){
                     gl.enable(gl.CULL_FACE);
-                    gl.cullFace(gl.FRONT);
                     backCulling=true;
                 }
                 else{
@@ -144,6 +153,8 @@ window.onload = function init() {
                 break;
         }   
     }
+
+    
 
     window.addEventListener("wheel", event => {
         const delta = Math.sign(event.deltaY);
@@ -160,29 +171,84 @@ window.onload = function init() {
 }
 
 function drawPrimitive(primitive){
-    gl.uniformMatrix4fv(mviewLoc, false, flatten(view));
     instances = {t: mat4(), p: drawFuncs[mode][primitive]};
 }
 
 
-/*
-function drawPrimitive(obj, mode, program) {
-    //gl.uniformMatrix4fv(mModelLoc, false, flatten(modelView));
-    //gl.uniformMatrix4fv(mviewLoc, false, flatten(modelView));
-    drawFuncs[mode][obj](gl, program);
+function isometria(){
+    var A= radians(30);
+    var B= radians(30);
+    var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
+    var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
+
+    //RX
+    var c = Math.cos(gama);
+    var s = Math.sin( gama);
+    //RY
+    var g = Math.cos(teta);
+    var o = Math.sin(teta);
+
+    var final=  mat4( -c*o, s, c*g, 0.0,
+        0.0, 0.0,  0.0, 0.0,
+        o*s, c,  -g*s, 0.0,
+        0.0, 0.0,  0.0, 1.0 )
+    ;
+
+    //mView=lookAt(vec3(-c*o, s, c*g),vec3(0.0, 0.0,0.0),vec3(o*s, c, -g*s));
+    eye=vec3(-c*o, s, c*g);
+    at = vec3(0.0, 0.0,0.0);
+    up=vec3(o*s, c, -g*s);
 }
-*/
+
+function dimetria(){
+    var A= radians(42);
+    var B= radians(7);
+    var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
+    var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
+
+    //RX
+    var c = Math.cos(gama);
+    var s = Math.sin( gama);
+    //RY
+    var g = Math.cos(teta);
+    var o = Math.sin(teta);
+
+    var final=  mat4( -c*o, s, c*g, 0.0,
+        0.0, 0.0,  0.0, 0.0,
+        o*s, c,  -g*s, 0.0,
+        0.0, 0.0,  0.0, 1.0 )
+    ;
+
+    //mView=lookAt(vec3(-c*o, s, c*g),vec3(0.0, 0.0,0.0),vec3(o*s, c, -g*s));
+    eye=vec3(-c*o, s, c*g);
+    at = vec3(0.0, 0.0,0.0);
+    up=vec3(o*s, c, -g*s);
+}
+
+
 
 
 function render() {
 
     drawPrimitive(primitive);
 
-    var projection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
+  
+
     mView = lookAt(eye, at, up);
-    //mView = perspective(5,4,0,20);
+    mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
+
+    /*
+    document.getElementById("perspetiva").onclick=function() {
+        isometria();
+        //console.log(perspective(2*Math.atan(1/d)*(180/Math.PI),1,0.1,10));
+        //mView = lookAt(perspective(2*Math.atan(1/d)*(180/Math.PI),1,0.1,10));
+        //mView = perspective(2*Math.atan(1/d)*(180/Math.PI),1,0.1,10);
+    };
+    */
+
+    //projection = perspective(2*Math.atan(1/d)*(180/Math.PI),1,0.1,10);
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
-    gl.uniformMatrix4fv(mProjectionLoc, false, flatten(projection));
+    gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
