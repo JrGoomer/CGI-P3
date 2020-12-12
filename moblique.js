@@ -15,6 +15,7 @@ var eye;
 var at;
 var up;
 
+
 var zbuffer=false,backCulling=false;
 
 var aspect = 2;
@@ -27,9 +28,9 @@ var ga=0.5,te=0.5;
 
 var drag = false;
 
-var angleX=1,angleY=1;
+var angleX=0, angleY=0;
+var oldX,oldY;
 
-//var perspective = "o";
 
 var drawFuncs = [
     [cubeDrawWireFrame, sphereDrawWireFrame, cylinderDrawWireFrame, torusDrawWireFrame, parabolicDrawWireFrame],
@@ -45,7 +46,6 @@ window.onload = function() {
     gl.viewport(0,0,canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 1.0);
 
-    
     // Load shaders and initialize attribute buffers
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
@@ -235,13 +235,6 @@ function axonometrica(A,B){
     var g = Math.cos(teta);
     var o = Math.sin(teta);
 
-    /*
-    var final=  mat4( -c*o, s, c*g, 0.0,
-        0.0, 0.0,  0.0, 0.0,
-        o*s, c,  -g*s, 0.0,
-        0.0, 0.0,  0.0, 1.0 )
-    ;
-        */
 
     eye=vec3(-c*o, s, c*g);
     at = vec3(0.0, 0.0,0.0);
@@ -261,13 +254,7 @@ function livre(gama,teta){
     var g = Math.cos(teta);
     var o = Math.sin(teta);
 
-    var final=  mat4( -c*o, s, c*g, 0.0,
-        0.0, 0.0,  0.0, 0.0,
-        o*s, c,  -g*s, 0.0,
-        0.0, 0.0,  0.0, 1.0 )
-    ;
 
-    //mView=lookAt(vec3(-c*o, s, c*g),vec3(0.0, 0.0,0.0),vec3(o*s, c, -g*s));
     eye=vec3(-c*o, s, c*g);
     at = vec3(0.0, 0.0,0.0);
     up=vec3(o*s, c, -g*s);
@@ -277,47 +264,43 @@ function livre(gama,teta){
 
 
 function mousedown(event) {
-    var x = event.clientX;
-    var y = event.clientY;
+    oldX = event.clientX;
+    oldY = event.clientY;
     var rect = event.target.getBoundingClientRect();
     // If we're within the rectangle, mouse is down within canvas.
-    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-        event.clientX = x;
-        event.clientY = y;
+    if (rect.left <= oldX && oldX < rect.right && rect.top <= oldY && oldY < rect.bottom) {
+        event.clientX = oldX;
+        event.clientY = oldY;
         drag = true;
     }
-    console.log(instances.t);
   }
 
   function mouseup(event) {
     drag = false;
+    console.log(drag);
   }
 
   function mousemove(event) {
-    var x = event.clientX;
-    var y = event.clientY;
     if (drag) {
       // The rotation speed factor
       // dx and dy here are how for in the x or y direction the mouse moved
-      var factor = 10/gl.canvas.height;
-      var dx = factor * (x - event.clientX);
-      var dy = factor * (y - event.clientY);
+      angleX += 0.1 * (event.clientX - oldX);
+      angleY += 0.1 *  (event.clientY - oldY);
 
       // update the latest angle
-      angleX = angleX + dy;
-      angleY = angleY + dx;
-    }
-    // update the last mouse position
-    event.clientX = x;
-    event.clientY = y;
+      angleX = Math.max(angleX, -Math.PI / 2 + 0.01);
+      angleY = Math.min(angleY, Math.PI / 2 - 0.01);
 
+
+        oldX = event.clientX;
+        oldY = event.clientY;
+    }
   }
 
 
 function render() {
 
     drawPrimitive(primitive);
-  
 
     mView = lookAt(eye, at, up);
     mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
@@ -325,10 +308,12 @@ function render() {
     if (!$('#perspetiva').is(":checked")) 
         mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
     else 
-        mProjection = perspective(2*Math.atan(1/2)*(180/Math.PI),1,0.1,10);
+        mProjection = perspective(150,1,0.1,10);
 
     mNormals = transpose(mult(instances.t,mView));
     //mViewNormals = transpose(mult(instances.t,mView));
+
+    mView = mult(mult(mView,rotateX(angleX)),rotateY(angleY));
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
