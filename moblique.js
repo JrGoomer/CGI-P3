@@ -307,13 +307,14 @@ function render() {
 
     if (!$('#perspetiva').is(":checked")) 
         mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
-    else 
+    else{
         mProjection = perspective(150,1,0.1,10);
+        mView = mult(mult(mView,rotateX(angleX)),rotateZ(angleY));
+    }
 
     mNormals = transpose(mult(instances.t,mView));
     //mViewNormals = transpose(mult(instances.t,mView));
 
-    mView = mult(mult(mView,rotateX(angleX)),rotateY(angleY));
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
