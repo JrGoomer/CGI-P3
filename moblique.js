@@ -228,36 +228,27 @@ function axonometrica(A,B){
     var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
     var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
 
-    //RX
-    var c = Math.cos(gama);
-    var s = Math.sin( gama);
-    //RY
-    var g = Math.cos(teta);
-    var o = Math.sin(teta);
+    var cg = Math.cos(gama);
+    var ct = Math.cos(teta);
+    var sg = Math.sin(gama);
+    var st = Math.sin(teta);
 
 
-    eye=vec3(-c*o, s, c*g);
+    eye=vec3(-cg*st, sg, cg*ct);
     at = vec3(0.0, 0.0,0.0);
-    up=vec3(o*s, c, -g*s);
+    up=vec3(st*sg, cg, -ct*sg);
 }
 
 function livre(gama,teta){
-    var A= radians(30);
-    var B= radians(30);
-    //var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
-    //var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
-
-    //RX
-    var c = Math.cos(gama);
-    var s = Math.sin(gama);
-    //RY
-    var g = Math.cos(teta);
-    var o = Math.sin(teta);
+    var cg = Math.cos(gama);
+    var ct = Math.cos(teta);
+    var sg = Math.sin(gama);
+    var st = Math.sin(teta);
 
 
-    eye=vec3(-c*o, s, c*g);
+    eye=vec3(-cg*st, sg, cg*ct);
     at = vec3(0.0, 0.0,0.0);
-    up=vec3(o*s, c, -g*s);
+    up=vec3(st*sg, cg, -ct*sg);
 }
 
 
@@ -313,12 +304,10 @@ function render() {
     }
 
     mNormals = transpose(mult(instances.t,mView));
-    //mViewNormals = transpose(mult(instances.t,mView));
 
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
-    //gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(mViewNormals));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
 
 
