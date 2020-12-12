@@ -1,6 +1,6 @@
 var gl, program;
 
-const CUBE=0,SPHERE=1,CYLINDER=2, TORUS=3;
+const CUBE=0,SPHERE=1,CYLINDER=2, TORUS=3, PARABOLIC=4;
 const WIRED=0;
 const NOT_WIRED=1;
 var instances;
@@ -27,8 +27,8 @@ var ga=0.5,te=0.5;
 //var perspective = "o";
 
 var drawFuncs = [
-    [cubeDrawWireFrame, sphereDrawWireFrame, cylinderDrawWireFrame, torusDrawWireFrame],
-    [cubeDrawFilled, sphereDrawFilled, cylinderDrawFilled, torusDrawFilled]
+    [cubeDrawWireFrame, sphereDrawWireFrame, cylinderDrawWireFrame, torusDrawWireFrame, parabolicDrawWireFrame],
+    [cubeDrawFilled, sphereDrawFilled, cylinderDrawFilled, torusDrawFilled, parabolicDrawFilled]
 ];
 
 window.onload = function() {
@@ -53,6 +53,7 @@ window.onload = function() {
     sphereInit(gl);
     cylinderInit(gl);
     torusInit(gl);
+    parabolicInit(gl);
 
     document.getElementById("new_cube").onclick=function() {
         primitive = CUBE;
@@ -70,13 +71,16 @@ window.onload = function() {
         primitive = TORUS;
     };
 
+    document.getElementById("new_parabolic").onclick=function() {
+        primitive = PARABOLIC;
+    };
+
     axonometrica(radians(42),radians(7));
 
     document.getElementById("reset_all").onclick=function() {
-        instances = undefined;       
-        eye = [1,1,1];
-        at = [0,0,0];
-        up = [0,0,1]; 
+        primitive=0;
+        instances = undefined;  
+        axonometrica(radians(42),radians(7));     
     };
 
 
@@ -203,6 +207,7 @@ window.onload = function() {
 }
 
 function drawPrimitive(primitive){
+    console.log(primitive);
     instances = {t: mat4(), p: drawFuncs[mode][primitive]};
 }
 
@@ -267,7 +272,7 @@ function render() {
     if (!$('#perspetiva').is(":checked")) 
         mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
     else 
-        mProjection = perspective(150,1,0.1,10);
+        mProjection = perspective(2*Math.atan(1/2)*(180/Math.PI),1,0.1,10);
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
