@@ -9,6 +9,7 @@ var primitive=CUBE;
 
 var mModelLoc;
 var mView,mProjection;
+var mNormals, mViewNormals;
 
 var eye;
 var at;
@@ -23,6 +24,10 @@ var alpha = 45, l=1;
 var mine=1;
 
 var ga=0.5,te=0.5;
+
+var drag = false;
+
+var angleX=1,angleY=1;
 
 //var perspective = "o";
 
@@ -48,12 +53,21 @@ window.onload = function() {
     mModelLoc = gl.getUniformLocation(program, "mModel");
     mviewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
+    mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
+    mNormalsLoc = gl.getUniformLocation(program, "mNormals");
+
 
     cubeInit(gl);
     sphereInit(gl);
     cylinderInit(gl);
     torusInit(gl);
     parabolicInit(gl);
+
+
+    gl.canvas.onmousedown = mousedown;
+    gl.canvas.onmouseup = mouseup;
+    gl.canvas.onmousemove = mousemove;
+
 
     document.getElementById("new_cube").onclick=function() {
         primitive = CUBE;
@@ -200,14 +214,12 @@ window.onload = function() {
             aspect--;
     });
 
-    //document.getElementById("l").oninput = update_oblique;
-    //document.getElementById("alpha").oninput = update_oblique;
-    //drawPrimitive(0, 1, program);
+
+
     render();
 }
 
 function drawPrimitive(primitive){
-    console.log(primitive);
     instances = {t: mat4(), p: drawFuncs[mode][primitive]};
 }
 
@@ -262,9 +274,50 @@ function livre(gama,teta){
 }
 
 
+
+
+function mousedown(event) {
+    var x = event.clientX;
+    var y = event.clientY;
+    var rect = event.target.getBoundingClientRect();
+    // If we're within the rectangle, mouse is down within canvas.
+    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
+        event.clientX = x;
+        event.clientY = y;
+        drag = true;
+    }
+    console.log(instances.t);
+  }
+
+  function mouseup(event) {
+    drag = false;
+  }
+
+  function mousemove(event) {
+    var x = event.clientX;
+    var y = event.clientY;
+    if (drag) {
+      // The rotation speed factor
+      // dx and dy here are how for in the x or y direction the mouse moved
+      var factor = 10/gl.canvas.height;
+      var dx = factor * (x - event.clientX);
+      var dy = factor * (y - event.clientY);
+
+      // update the latest angle
+      angleX = angleX + dy;
+      angleY = angleY + dx;
+    }
+    // update the last mouse position
+    event.clientX = x;
+    event.clientY = y;
+
+  }
+
+
 function render() {
 
     drawPrimitive(primitive);
+  
 
     mView = lookAt(eye, at, up);
     mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
@@ -274,8 +327,14 @@ function render() {
     else 
         mProjection = perspective(2*Math.atan(1/2)*(180/Math.PI),1,0.1,10);
 
+    mNormals = transpose(mult(instances.t,mView));
+    //mViewNormals = transpose(mult(instances.t,mView));
+
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
+    //gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(mViewNormals));
+    gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
+
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
