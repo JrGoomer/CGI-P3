@@ -8,6 +8,9 @@
 .axonometrica {
     display: none;
 }
+.slidecontainer{
+    display: none;
+}
 </style>
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
@@ -65,24 +68,28 @@ void main() {
     <br>
     <div class="ortogonal">
         <form>
-            <input type="radio" id="principal" name="projection">
+            <input type="radio" id="principal" name="orto">
             <label for="principal">Principal</label>
-            <input type="radio" id="planta" name="projection">
+            <input type="radio" id="planta" name="orto">
             <label for="planta">Planta</label>
-            <input type="radio" id="direito" name="projection">
+            <input type="radio" id="direito" name="orto">
             <label for="direito">Alçado lateral direito</label>
           </form>
     </div>
     <div class="axonometrica">
         <form>
-            <input type="radio" id="isometrica" name="projection">
+            <input type="radio" id="isometrica" name="ax">
             <label for="isometrica">Isometrica</label>
-            <input type="radio" id="dimetrica" name="projection">
+            <input type="radio" id="dimetrica" name="ax">
             <label for="dimetrica">Dimétrica</label>
-            <input type="radio" id="trimetrica" name="projection">
+            <input type="radio" id="trimetrica" name="ax">
             <label for="trimetrica">Trimétrica</label>
-            <input type="radio" id="livre" name="projection">
+            <input type="radio" id="livre" name="ax" value='livre'>
             <label for="livre">Livre</label>
+            <div class="slidecontainer">
+                <input type="range" min="0" max="100" value="50" id="gamma">
+                <input type="range" min="0" max="100" value="50" id="theta">
+            </div>
           </form>
     </div>
 </body>
