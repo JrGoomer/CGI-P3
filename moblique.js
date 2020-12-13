@@ -48,9 +48,8 @@ function locs(){
     mviewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
-    mViewNormals = gl.getUniformLocation(program, "mViewNormals");
     mNormalsLoc = gl.getUniformLocation(program, "mNormals");
-    shininessLoc = gl.getUniformLocation(program, "shininess");
+    shininessLoc = gl.getUniformLocation(program, "fzshininess");
     lightAmbLoc = gl.getUniformLocation(program, "lightAmb");
     lightDifLoc = gl.getUniformLocation(program, "lightDif");
     lightSpeLoc = gl.getUniformLocation(program, "lightSpe");
@@ -452,7 +451,7 @@ function uniforms(){
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
-    gl.uniformMatrix4fv(mViewNormals, false, flatten(mNormals));
+    gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(mViewNormals));
     gl.uniform1f(shininessLoc, shininess);
     gl.uniform3fv(lightAmbLoc, lightAmb);
     gl.uniform3fv(lightDifLoc, lightDif);
@@ -478,7 +477,8 @@ function render() {
         mView = mult(mult(mView,rotateX(angleX)),rotateZ(angleY));
     }
 
-    mNormals = transpose(mult(instances.t,mView));
+    mNormals = normalMatrix(mult(instances.t,mView),false);
+    mViewNormals = normalMatrix(mult(instances.t,mView),false);
 
     uniforms();
 
