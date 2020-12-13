@@ -10,10 +10,11 @@ var primitive=CUBE;
 var mModelLoc;
 var mView,mProjection;
 var mNormals, mViewNormals,shininess=6;
-var lightAmb = vec3(0.5, 0.2, 0.2), lightDif = vec3(0.7, 0.7, 0.7), lightSpe = vec3(0.1, 0.2, 1.0), lightPos = vec4(0.0,0.0,0.0,1.0);
+var lightAmb = vec3(0.5, 0.2, 0.2), lightDif = vec3(0.7, 0.7, 0.7), lightSpe = vec3(0.1, 0.2, 1.0), lightPos = vec4(0,2,2,0);
 var materialAmb = vec3(1.0, 1.0, 1.0);
 var materialDif = vec3(1.0, 1.0, 1.0);
 var materialSpe = vec3(1.0, 1.0, 1.0);
+
 
 var eye;
 var at;
@@ -47,6 +48,7 @@ function locs(){
     mviewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
+    mViewNormals = gl.getUniformLocation(program, "mViewNormals");
     mNormalsLoc = gl.getUniformLocation(program, "mNormals");
     shininessLoc = gl.getUniformLocation(program, "shininess");
     lightAmbLoc = gl.getUniformLocation(program, "lightAmb");
@@ -161,6 +163,14 @@ window.onload = function() {
     ortogonal();
 
 
+
+    document.getElementById("switch").onchange=function() {
+        if(lightPos[3])
+            lightPos[3] = 0;
+        else
+            lightPos[3] = 1;
+    };
+
     document.getElementById("isometrica").onclick=function() {
         axonometrica(30,30);
     };
@@ -264,10 +274,6 @@ window.onload = function() {
     document.getElementById("materialSpe3").oninput =function() {
         lightSpe[2] = this.value/100;
     };
-
-
-
-
 
     document.getElementById("lightPos1").oninput =function() {
         lightPos[0] = this.value/100;
@@ -446,6 +452,7 @@ function uniforms(){
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
+    gl.uniformMatrix4fv(mViewNormals, false, flatten(mNormals));
     gl.uniform1f(shininessLoc, shininess);
     gl.uniform3fv(lightAmbLoc, lightAmb);
     gl.uniform3fv(lightDifLoc, lightDif);

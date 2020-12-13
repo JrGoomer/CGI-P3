@@ -17,6 +17,8 @@
 #light{
     display:inline;
 }
+
+}
 </style>
 <script id="vertex-shader" type="x-shader/x-vertex">
     uniform vec4 lightPosition;
@@ -151,7 +153,9 @@ void main() {
             <input type="radio" id="livre" name="ax" value='livre'>
             <label for="livre">Livre</label>
             <div class="slidecontainer">
+                <p id="inline">Gamma:</p>
                 <input type="range" min="0" max="100" value="50" id="gamma">
+                <p id="inline">Theta:</p>
                 <input type="range" min="0" max="100" value="50" id="theta">
             </div>
           </form>
@@ -168,6 +172,8 @@ void main() {
             <input type="range" min="1" max="100" value="50" id="lightPos2">
             <p id="inline">Z:</p>
             <input type="range" min="1" max="100" value="50" id="lightPos3">
+            <p id="inline">Pontual:</p>
+                <input type="checkbox" id="switch">
             <br>
             <br>
         </div>
@@ -180,7 +186,7 @@ void main() {
             <input type="range" min="1" max="100" value="50" id="lightDif2">
             <input type="range" min="1" max="100" value="50" id="lightDif3">
             <br>
-            <p>Light Specturm:</p>
+            <p>Light Specular:</p>
             <input type="range" min="1" max="100" value="50" id="lightSpe1">
             <input type="range" min="1" max="100" value="50" id="lightSpe2">
             <input type="range" min="1" max="100" value="50" id="lightSpe3">
@@ -196,7 +202,7 @@ void main() {
             <input type="range" min="1" max="100" value="50" id="materialDif2">
             <input type="range" min="1" max="100" value="50" id="materialDif3">
             <br>
-            <p>Material Specturm</p>
+            <p>Material Specular:</p>
             <input type="range" min="1" max="100" value="50" id="materialSpe1">
             <input type="range" min="1" max="100" value="50" id="materialSpe2">
             <input type="range" min="1" max="100" value="50" id="materialSpe3">
