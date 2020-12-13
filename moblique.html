@@ -17,6 +17,16 @@
 #light{
     display:inline;
 }
+#material{
+    float:right;
+}
+#light{
+    display: inline-block;
+}
+p{
+    line-height: 1px;
+}
+
 </style>
 <script id="vertex-shader" type="x-shader/x-vertex">
     uniform vec4 lightPosition;
@@ -68,7 +78,7 @@ uniform vec3 lightAmb;
 uniform vec3 lightDif;
 uniform vec3 lightSpe;
 
-vec3 ambientColor = lightAmb*materialAmb;
+vec3 ambientColor = lightAmb* materialAmb;
 vec3 diffuseColor = lightDif * materialDif;
 vec3 specularColor = lightSpe * materialSpe;
 
@@ -179,35 +189,39 @@ void main() {
             <br>
             <br>
         </div>
-        <div id="aa">
-            <input type="range" min="1" max="100" value="50" id="lightAmb1">
-            <input type="range" min="1" max="100" value="20" id="lightAmb2">
-            <input type="range" min="1" max="100" value="20" id="lightAmb3">
-            <br>
-            <input type="range" min="1" max="100" value="70" id="lightDif1">
-            <input type="range" min="1" max="100" value="70" id="lightDif2">
-            <input type="range" min="1" max="100" value="70" id="lightDif3">
-            <br>
-            <p>Light Specular:</p>
-            <input type="range" min="1" max="100" value="10" id="lightSpe1">
-            <input type="range" min="1" max="100" value="20" id="lightSpe2">
-            <input type="range" min="1" max="100" value="100" id="lightSpe3">
-            <br>
-            <br>
+        <div id="light">
+                <p>Light Ambient:</p>
+                <input type="range" min="1" max="100" value="50" id="lightAmb1">
+                <input type="range" min="1" max="100" value="20" id="lightAmb2">
+                <input type="range" min="1" max="100" value="20" id="lightAmb3">
+                <br>
+                <p>Light Diffuse:</p>
+                <input type="range" min="1" max="100" value="70" id="lightDif1">
+                <input type="range" min="1" max="100" value="70" id="lightDif2">
+                <input type="range" min="1" max="100" value="70" id="lightDif3">
+                <br>
+                <p>Light Specular:</p>
+                <input type="range" min="1" max="100" value="10" id="lightSpe1">
+                <input type="range" min="1" max="100" value="20" id="lightSpe2">
+                <input type="range" min="1" max="100" value="100" id="lightSpe3">
+                <br>
+                <br>
         </div>
-        <div id="aa">
-            <input type="range" min="1" max="100" value="100" id="materialAmb1">
-            <input type="range" min="1" max="100" value="100" id="materialAmb2">
-            <input type="range" min="1" max="100" value="100" id="materialAmb3">
-            <br>
-            <input type="range" min="1" max="100" value="100" id="materialDif1">
-            <input type="range" min="1" max="100" value="100" id="materialDif2">
-            <input type="range" min="1" max="100" value="100" id="materialDif3">
-            <br>
-            <p>Material Specular:</p>
-            <input type="range" min="1" max="100" value="100" id="materialSpe1">
-            <input type="range" min="1" max="100" value="10" id="materialSpe2">
-            <input type="range" min="1" max="100" value="40" id="materialSpe3">
+        <div id="material">
+                <p>Material Ambient:</p>
+                <input type="range" min="1" max="100" value="100" id="materialAmb1">
+                <input type="range" min="1" max="100" value="100" id="materialAmb2">
+                <input type="range" min="1" max="100" value="100" id="materialAmb3">
+                <br>
+                <p>Material Diffuse:</p>
+                <input type="range" min="1" max="100" value="100" id="materialDif1">
+                <input type="range" min="1" max="100" value="100" id="materialDif2">
+                <input type="range" min="1" max="100" value="100" id="materialDif3">
+                <br>
+                <p>Material Specular:</p>
+                <input type="range" min="1" max="100" value="100" id="materialSpe1">
+                <input type="range" min="1" max="100" value="10" id="materialSpe2">
+                <input type="range" min="1" max="100" value="40" id="materialSpe3">
         </div>
     </div>
 </body>

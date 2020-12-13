@@ -93,7 +93,8 @@ function drawOnClick(){
 
     document.getElementById("reset_all").onclick=function() {
         primitive=0;
-        instances = undefined;  
+        instances = undefined; 
+        lightOff=0; 
         axonometrica(42,7);     
         $("input:radio").removeAttr("checked");
         $(".axonometrica").hide();
