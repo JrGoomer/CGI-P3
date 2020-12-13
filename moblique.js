@@ -468,20 +468,21 @@ function mousedown(event) {
   }
 
   function mousemove(event) {
+    var x = event.clientX;
+    var y = event.clientY;
     if (drag) {
       // The rotation speed factor
       // dx and dy here are how for in the x or y direction the mouse moved
-      angleX += 0.1 * (event.clientX - oldX);
-      angleY += 0.1 *  (event.clientY - oldY);
+      angleX += 0.1 * (x - oldX);
+      angleY += 0.1 *  (y - oldY);
 
       // update the latest angle
-      angleX = Math.max(angleX, -Math.PI / 2 + 0.01);
-      angleY = Math.min(angleY, Math.PI / 2 - 0.01);
-
-
-        oldX = event.clientX;
-        oldY = event.clientY;
+      //angleX = Math.max(angleX, -Math.PI / 2 + 0.01);
+      //angleY = Math.min(angleY, Math.PI / 2 - 0.01);
     }
+
+    oldX = x;
+    oldY = y;
   }
 
 
@@ -515,7 +516,7 @@ function render() {
         mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
     else{
         mProjection = perspective(150,1,0.1,10);
-        mView = mult(mult(mView,rotateX(angleX)),rotateZ(angleY));
+        mView = mult(mult(mView,rotateY(angleY)),rotateZ(angleX));
     }
 
     mNormals = normalMatrix(mult(instances.t,mView),false);
