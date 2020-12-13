@@ -100,23 +100,35 @@ function drawOnClick(){
 }
 
 
+function principal(){
+    eye = [0,0,0];
+    at = [0,0,0]; 
+    up = [0,1,0];  
+}
+
+function planta(){
+    eye = [0,1,0];
+        at = [0,0,0];
+        up = [0,0,1]; 
+}
+
+function direito(){
+    eye = [1,0,0];
+    at = [0,0,0];
+    up = [0,1,0]; 
+}
+
 function ortogonal(){
     document.getElementById("principal").onclick=function() {  
-        eye = [0,0,0];
-        at = [0,0,0]; 
-        up = [0,1,0];  
+        principal();  
     };
 
     document.getElementById("planta").onclick=function() {  
-        eye = [0,1,0];
-        at = [0,0,0];
-        up = [0,0,1]; 
+        planta(); 
     };
 
     document.getElementById("direito").onclick=function() {  
-        eye = [1,0,0];
-        at = [0,0,0];
-        up = [0,1,0]; 
+        direito();
     };
 }
 
@@ -270,10 +282,6 @@ window.onload = function() {
     };
 
 
-
-
-
-
     document.getElementById("perspetiva").onclick=function() {
         eye = [1,0,0];
         at = [0,0,0];
@@ -283,12 +291,23 @@ window.onload = function() {
     $("[value='ortogonal'").click(function() {
         $(".axonometrica").hide();
         $(".ortogonal").show();
+        if ($('#principal').is(":checked")) 
+            principal();
+        else if ($('#planta').is(":checked")) 
+           planta();
+        else if ($('#direito').is(":checked")) 
+            direito();
     });
 
     $("[value='axonometrica'").click(function() {
         $(".ortogonal").hide();
         $(".axonometrica").show();
-
+        if ($('#isometrica').is(":checked")) 
+            axonometrica(30,30);
+        else if ($('#dimetrica').is(":checked")) 
+            axonometrica(42,7);
+        else if ($('#trimetrica').is(":checked")) 
+            axonometrica(54+(16/60),23+(16/60));
     });
 
     $("[value='perspetiva'").click(function() {
