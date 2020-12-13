@@ -11,10 +11,17 @@
 .slidecontainer{
     display: none;
 }
+#inline{
+    display:inline;
+}
+#light{
+    display:inline;
+}
 </style>
 <script id="vertex-shader" type="x-shader/x-vertex">
-    const vec4 lightPosition = vec4(0.0,0, 0, 1.0);
+    uniform vec4 lightPosition;
     
+
     attribute vec4 vPosition;
     attribute vec4 vNormal;
 
@@ -50,15 +57,15 @@ varying vec3 fPosition;
 varying vec3 fNormal;
 
 
-const vec3 materialAmb = vec3(1.0, 0.0, 0.0);
-const vec3 materialDif = vec3(1.0, 0.0, 0.0);
-const vec3 materialSpe = vec3(1.0, 1.0, 1.0);
+uniform vec3 materialAmb;
+uniform vec3 materialDif;
+uniform vec3 materialSpe;
 
-const float shininess = 6.0;
+uniform float shininess;
 
-const vec3 lightAmb = vec3(0.2, 0.2, 0.2);
-const vec3 lightDif = vec3(0.7, 0.7, 0.7);
-const vec3 lightSpe = vec3(1.0, 1.0, 1.0);
+uniform vec3 lightAmb;
+uniform vec3 lightDif;
+uniform vec3 lightSpe;
 
 vec3 ambientColor = lightAmb*materialAmb;
 vec3 diffuseColor = lightDif * materialDif;
@@ -148,6 +155,52 @@ void main() {
                 <input type="range" min="0" max="100" value="50" id="theta">
             </div>
           </form>
+    </div>
+    <div class="light">
+        <div id="aa">
+            <p id="inline">Light Shininess:</p>
+            <input type="range" min="1" max="12" value="50" id="shininess">
+            <br>
+            <p>Light Position:</p>
+            <p id="inline">X:</p>
+            <input type="range" min="1" max="100" value="50" id="lightPos1">
+            <p id="inline">Y:</p>
+            <input type="range" min="1" max="100" value="50" id="lightPos2">
+            <p id="inline">Z:</p>
+            <input type="range" min="1" max="100" value="50" id="lightPos3">
+            <br>
+            <br>
+        </div>
+        <div id="aa">
+            <input type="range" min="1" max="100" value="50" id="lightAmb1">
+            <input type="range" min="1" max="100" value="50" id="lightAmb2">
+            <input type="range" min="1" max="100" value="50" id="lightAmb3">
+            <br>
+            <input type="range" min="1" max="100" value="50" id="lightDif1">
+            <input type="range" min="1" max="100" value="50" id="lightDif2">
+            <input type="range" min="1" max="100" value="50" id="lightDif3">
+            <br>
+            <p>Light Specturm:</p>
+            <input type="range" min="1" max="100" value="50" id="lightSpe1">
+            <input type="range" min="1" max="100" value="50" id="lightSpe2">
+            <input type="range" min="1" max="100" value="50" id="lightSpe3">
+            <br>
+            <br>
+        </div>
+        <div id="aa">
+            <input type="range" min="1" max="100" value="50" id="materialAmb1">
+            <input type="range" min="1" max="100" value="50" id="materialAmb2">
+            <input type="range" min="1" max="100" value="50" id="materialAmb3">
+            <br>
+            <input type="range" min="1" max="100" value="50" id="materialDif1">
+            <input type="range" min="1" max="100" value="50" id="materialDif2">
+            <input type="range" min="1" max="100" value="50" id="materialDif3">
+            <br>
+            <p>Material Specturm</p>
+            <input type="range" min="1" max="100" value="50" id="materialSpe1">
+            <input type="range" min="1" max="100" value="50" id="materialSpe2">
+            <input type="range" min="1" max="100" value="50" id="materialSpe3">
+        </div>
     </div>
 </body>
 </html>

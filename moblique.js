@@ -9,7 +9,10 @@ var primitive=CUBE;
 
 var mModelLoc;
 var mView,mProjection;
-var mNormals, mViewNormals;
+var mNormals, mViewNormals,shininess=6, lightAmb = vec3(0.5, 0.2, 0.2), lightDif = vec3(0.7, 0.7, 0.7), lightSpe = vec3(0.1, 0.2, 1.0), lightPos = vec4(0.0,0.0,0.0,1.0);
+var materialAmb = vec3(1.0, 1.0, 1.0);
+var materialDif = vec3(1.0, 1.0, 1.0);
+var materialSpe = vec3(1.0, 1.0, 1.0);
 
 var eye;
 var at;
@@ -55,8 +58,16 @@ window.onload = function() {
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
     mNormalsLoc = gl.getUniformLocation(program, "mNormals");
+    shininessLoc = gl.getUniformLocation(program, "shininess");
+    lightAmbLoc = gl.getUniformLocation(program, "lightAmb");
+    lightDifLoc = gl.getUniformLocation(program, "lightDif");
+    lightSpeLoc = gl.getUniformLocation(program, "lightSpe");
+    materialAmbLoc = gl.getUniformLocation(program, "materialAmb");
+    materialDifLoc = gl.getUniformLocation(program, "materialDif");
+    materialSpeLoc = gl.getUniformLocation(program, "materialSpe");
+    lightPosLoc = gl.getUniformLocation(program, "lightPosition");
 
-
+    
     cubeInit(gl);
     sphereInit(gl);
     cylinderInit(gl);
@@ -89,7 +100,7 @@ window.onload = function() {
         primitive = PARABOLIC;
     };
 
-    axonometrica(radians(42),radians(7));
+    axonometrica(42,7);
 
     document.getElementById("reset_all").onclick=function() {
         primitive=0;
@@ -118,15 +129,15 @@ window.onload = function() {
 
 
     document.getElementById("isometrica").onclick=function() {
-        axonometrica(radians(30),radians(30));
+        axonometrica(30,30);
     };
 
     document.getElementById("dimetrica").onclick=function() {
-        axonometrica(radians(42),radians(7));
+        axonometrica(42,7);
     };
    
     document.getElementById("trimetrica").onclick=function() {
-        axonometrica(radians(54+(16/60)),radians(23+(16/60)));
+        axonometrica(54+(16/60),23+(16/60));
     };
     
     document.getElementById("livre").onclick=function() {
@@ -142,6 +153,104 @@ window.onload = function() {
         ga = this.value/100;
         livre(ga,te);
     };
+
+    document.getElementById("shininess").oninput =function() {
+        shininess = this.value;
+    };
+
+    document.getElementById("lightAmb1").oninput =function() {
+        lightAmb[0] = this.value/100;
+    };
+
+    document.getElementById("lightAmb2").oninput =function() {
+        lightAmb[1] = this.value/100;
+    };
+
+    document.getElementById("lightAmb3").oninput =function() {
+        lightAmb[2] = this.value/100;
+    };
+
+    document.getElementById("lightDif1").oninput =function() {
+        lightDif[0] = this.value/100;
+    };
+
+    document.getElementById("lightDif2").oninput =function() {
+        lightDif[1] = this.value/100;
+    };
+
+    document.getElementById("lightDif3").oninput =function() {
+        lightDif[2] = this.value/100;
+    };
+
+    document.getElementById("lightSpe1").oninput =function() {
+        lightSpe[0] = this.value/100;
+    };
+
+    document.getElementById("lightSpe2").oninput =function() {
+        lightSpe[1] = this.value/100;
+    };
+
+    document.getElementById("lightSpe3").oninput =function() {
+        lightSpe[2] = this.value/100;
+    };
+
+
+
+    document.getElementById("materialAmb1").oninput =function() {
+        lightAmb[0] = this.value/100;
+    };
+
+    document.getElementById("materialAmb2").oninput =function() {
+        lightAmb[1] = this.value/100;
+    };
+
+    document.getElementById("materialAmb3").oninput =function() {
+        lightAmb[2] = this.value/100;
+    };
+
+    document.getElementById("materialDif1").oninput =function() {
+        lightDif[0] = this.value/100;
+    };
+
+    document.getElementById("materialDif2").oninput =function() {
+        lightDif[1] = this.value/100;
+    };
+
+    document.getElementById("materialDif3").oninput =function() {
+        lightDif[2] = this.value/100;
+    };
+
+    document.getElementById("materialSpe1").oninput =function() {
+        lightSpe[0] = this.value/100;
+    };
+
+    document.getElementById("materialSpe2").oninput =function() {
+        lightSpe[1] = this.value/100;
+    };
+
+    document.getElementById("materialSpe3").oninput =function() {
+        lightSpe[2] = this.value/100;
+    };
+
+
+
+
+
+    document.getElementById("lightPos1").oninput =function() {
+        lightPos[0] = this.value/100;
+    };
+
+    document.getElementById("lightPos2").oninput =function() {
+        lightPos[1] = this.value/100;
+    };
+
+    document.getElementById("lightPos3").oninput =function() {
+        lightPos[2] = this.value/100;
+    };
+
+
+
+
 
 
     document.getElementById("perspetiva").onclick=function() {
@@ -215,7 +324,6 @@ window.onload = function() {
     });
 
 
-
     render();
 }
 
@@ -224,7 +332,9 @@ function drawPrimitive(primitive){
 }
 
 
-function axonometrica(A,B){
+function axonometrica(f,s){
+    var A = radians(f);
+    var B = radians(s);
     var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
     var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
 
@@ -268,7 +378,6 @@ function mousedown(event) {
 
   function mouseup(event) {
     drag = false;
-    console.log(drag);
   }
 
   function mousemove(event) {
@@ -293,6 +402,7 @@ function render() {
 
     drawPrimitive(primitive);
 
+
     mView = lookAt(eye, at, up);
     mProjection = ortho(-aspect,aspect, -aspect, aspect,-10,10);
 
@@ -309,7 +419,14 @@ function render() {
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
-
+    gl.uniform1f(shininessLoc, shininess);
+    gl.uniform3fv(lightAmbLoc, lightAmb);
+    gl.uniform3fv(lightDifLoc, lightDif);
+    gl.uniform3fv(lightSpeLoc, lightSpe);
+    gl.uniform4fv(lightPosLoc, lightPos);
+    gl.uniform3fv(materialAmbLoc, materialAmb);
+    gl.uniform3fv(materialDifLoc, materialDif);
+    gl.uniform3fv(materialSpeLoc, materialSpe);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
