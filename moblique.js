@@ -9,7 +9,8 @@ var primitive=CUBE;
 
 var mModelLoc;
 var mView,mProjection;
-var mNormals, mViewNormals,shininess=6, lightAmb = vec3(0.5, 0.2, 0.2), lightDif = vec3(0.7, 0.7, 0.7), lightSpe = vec3(0.1, 0.2, 1.0), lightPos = vec4(0.0,0.0,0.0,1.0);
+var mNormals, mViewNormals,shininess=6;
+var lightAmb = vec3(0.5, 0.2, 0.2), lightDif = vec3(0.7, 0.7, 0.7), lightSpe = vec3(0.1, 0.2, 1.0), lightPos = vec4(0.0,0.0,0.0,1.0);
 var materialAmb = vec3(1.0, 1.0, 1.0);
 var materialDif = vec3(1.0, 1.0, 1.0);
 var materialSpe = vec3(1.0, 1.0, 1.0);
@@ -40,19 +41,8 @@ var drawFuncs = [
     [cubeDrawFilled, sphereDrawFilled, cylinderDrawFilled, torusDrawFilled, parabolicDrawFilled]
 ];
 
-window.onload = function() {
-    var canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if(!gl) { alert("WebGL isn't available"); }
-    
-    // Configure WebGL
-    gl.viewport(0,0,canvas.width, canvas.height);
-    gl.clearColor(0, 0, 0, 1.0);
 
-    // Load shaders and initialize attribute buffers
-    program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
-
+function locs(){
     mModelLoc = gl.getUniformLocation(program, "mModel");
     mviewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
@@ -67,18 +57,17 @@ window.onload = function() {
     materialSpeLoc = gl.getUniformLocation(program, "materialSpe");
     lightPosLoc = gl.getUniformLocation(program, "lightPosition");
 
-    
+
+
     cubeInit(gl);
     sphereInit(gl);
     cylinderInit(gl);
     torusInit(gl);
     parabolicInit(gl);
+}
 
 
-    gl.canvas.onmousedown = mousedown;
-    gl.canvas.onmouseup = mouseup;
-    gl.canvas.onmousemove = mousemove;
-
+function drawOnClick(){
 
     document.getElementById("new_cube").onclick=function() {
         primitive = CUBE;
@@ -100,15 +89,18 @@ window.onload = function() {
         primitive = PARABOLIC;
     };
 
-    axonometrica(42,7);
-
     document.getElementById("reset_all").onclick=function() {
         primitive=0;
         instances = undefined;  
-        axonometrica(radians(42),radians(7));     
+        axonometrica(42,7);     
+        $("input:radio").removeAttr("checked");
+        $(".axonometrica").hide();
+        $(".ortogonal").hide();
     };
+}
 
 
+function ortogonal(){
     document.getElementById("principal").onclick=function() {  
         eye = [0,0,0];
         at = [0,0,0]; 
@@ -124,8 +116,37 @@ window.onload = function() {
     document.getElementById("direito").onclick=function() {  
         eye = [1,0,0];
         at = [0,0,0];
-        up = [0,0,1]; 
+        up = [0,1,0]; 
     };
+}
+
+
+window.onload = function() {
+    var canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if(!gl) { alert("WebGL isn't available"); }
+    
+    // Configure WebGL
+    gl.viewport(0,0,canvas.width, canvas.height);
+    gl.clearColor(0, 0, 0, 1.0);
+
+    // Load shaders and initialize attribute buffers
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
+    gl.useProgram(program);
+
+    locs();
+
+
+    gl.canvas.onmousedown = mousedown;
+    gl.canvas.onmouseup = mouseup;
+    gl.canvas.onmousemove = mousemove;
+
+    drawOnClick();
+
+    axonometrica(42,7);
+
+
+    ortogonal();
 
 
     document.getElementById("isometrica").onclick=function() {
@@ -260,18 +281,19 @@ window.onload = function() {
     };
 
     $("[value='ortogonal'").click(function() {
-        $(".axonometrica").hide()
-        $(".ortogonal").show()
+        $(".axonometrica").hide();
+        $(".ortogonal").show();
     });
 
     $("[value='axonometrica'").click(function() {
-        $(".ortogonal").hide()
-        $(".axonometrica").show()
+        $(".ortogonal").hide();
+        $(".axonometrica").show();
+
     });
 
     $("[value='perspetiva'").click(function() {
-        $(".ortogonal").hide()
-        $(".axonometrica").hide()
+        $(".ortogonal").hide();
+        $(".axonometrica").hide();
     });
 
     $('input[name=ax]').change(function(){
@@ -335,8 +357,10 @@ function drawPrimitive(primitive){
 function axonometrica(f,s){
     var A = radians(f);
     var B = radians(s);
-    var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
+
+
     var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
+    var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
 
     var cg = Math.cos(gama);
     var ct = Math.cos(teta);
@@ -354,7 +378,6 @@ function livre(gama,teta){
     var ct = Math.cos(teta);
     var sg = Math.sin(gama);
     var st = Math.sin(teta);
-
 
     eye=vec3(-cg*st, sg, cg*ct);
     at = vec3(0.0, 0.0,0.0);
@@ -398,6 +421,22 @@ function mousedown(event) {
   }
 
 
+
+
+function uniforms(){
+    gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
+    gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
+    gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
+    gl.uniform1f(shininessLoc, shininess);
+    gl.uniform3fv(lightAmbLoc, lightAmb);
+    gl.uniform3fv(lightDifLoc, lightDif);
+    gl.uniform3fv(lightSpeLoc, lightSpe);
+    gl.uniform4fv(lightPosLoc, lightPos);
+    gl.uniform3fv(materialAmbLoc, materialAmb);
+    gl.uniform3fv(materialDifLoc, materialDif);
+    gl.uniform3fv(materialSpeLoc, materialSpe);
+}
+
 function render() {
 
     drawPrimitive(primitive);
@@ -415,18 +454,8 @@ function render() {
 
     mNormals = transpose(mult(instances.t,mView));
 
+    uniforms();
 
-    gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
-    gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
-    gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
-    gl.uniform1f(shininessLoc, shininess);
-    gl.uniform3fv(lightAmbLoc, lightAmb);
-    gl.uniform3fv(lightDifLoc, lightDif);
-    gl.uniform3fv(lightSpeLoc, lightSpe);
-    gl.uniform4fv(lightPosLoc, lightPos);
-    gl.uniform3fv(materialAmbLoc, materialAmb);
-    gl.uniform3fv(materialDifLoc, materialDif);
-    gl.uniform3fv(materialSpeLoc, materialSpe);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

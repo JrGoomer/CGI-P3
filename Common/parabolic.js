@@ -36,7 +36,7 @@ function parabolicBuild(nlat, nlon)
     for(var i=0, phi=Math.PI/2-d_phi; i<nlat; i++, phi-=d_phi) {
         var tmp=phi*(1/3);
         for(var j=0, theta=0; j<nlon; j++, theta+=d_theta) {
-            var pt = vec3(tmp*2*phi*Math.cos(theta),2*phi*tmp*tmp,tmp*3*phi*Math.sin(theta));
+            var pt = vec3(tmp*phi*Math.cos(theta),phi*tmp*tmp,tmp*3*phi*Math.sin(theta));
             parabolic_points.push(pt);
             var n = vec3(pt);
             parabolic_normals.push(normalize(n));
