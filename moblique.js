@@ -13,8 +13,9 @@ var mNormals, mViewNormals,shininess=6;
 var lightAmb = vec3(0.5, 0.2, 0.2), lightDif = vec3(0.7, 0.7, 0.7), lightSpe = vec3(0.1, 0.2, 1.0), lightPos = vec4(0,2,2,0);
 var materialAmb = vec3(1.0, 1.0, 1.0);
 var materialDif = vec3(1.0, 1.0, 1.0);
-var materialSpe = vec3(1.0, 1.0, 1.0);
+var materialSpe = vec3(1.0, 0.1, 0.4);
 
+var lightOff=0;
 
 var eye;
 var at;
@@ -57,7 +58,7 @@ function locs(){
     materialDifLoc = gl.getUniformLocation(program, "materialDif");
     materialSpeLoc = gl.getUniformLocation(program, "materialSpe");
     lightPosLoc = gl.getUniformLocation(program, "lightPosition");
-
+    lightOffLoc = gl.getUniformLocation(program, "lightOff");
 
 
     cubeInit(gl);
@@ -97,6 +98,38 @@ function drawOnClick(){
         $("input:radio").removeAttr("checked");
         $(".axonometrica").hide();
         $(".ortogonal").hide();
+        shininess=6;
+        lightAmb = vec3(0.5, 0.2, 0.2); 
+        lightDif = vec3(0.7, 0.7, 0.7);
+        lightSpe = vec3(0.1, 0.2, 1.0);
+        lightPos = vec4(0,2,2,0);
+        materialAmb = vec3(1.0, 1.0, 1.0);
+        materialDif = vec3(1.0, 1.0, 1.0);
+        materialSpe = vec3(1.0, 0.1, 0.4);
+
+        document.getElementById("shininess").value = 6;
+        document.getElementById("lightAmb1").value = 50;
+        document.getElementById("lightAmb2").value = 20;
+        document.getElementById("lightAmb3").value =20;
+        document.getElementById("lightDif1").value =70;
+        document.getElementById("lightDif2").value =70;
+        document.getElementById("lightDif3").value =70;
+        document.getElementById("lightSpe1").value =10;
+        document.getElementById("lightSpe2").value =20;
+        document.getElementById("lightSpe3").value =100;
+        document.getElementById("materialAmb1").value =100;
+        document.getElementById("materialAmb2").value =100;
+        document.getElementById("materialAmb3").value =100;
+        document.getElementById("materialDif1").value =100;
+        document.getElementById("materialDif2").value =100;
+        document.getElementById("materialDif3").value =100;
+        document.getElementById("materialSpe1").value =100;
+        document.getElementById("materialSpe2").value =10;
+        document.getElementById("materialSpe3").value = 40;
+        document.getElementById("lightPos1").value =0;
+        document.getElementById("lightPos2").value =20;
+        document.getElementById("lightPos3").value =20;
+    
     };
 }
 
@@ -275,15 +308,15 @@ window.onload = function() {
     };
 
     document.getElementById("lightPos1").oninput =function() {
-        lightPos[0] = this.value/100;
+        lightPos[0] = this.value/10;
     };
 
     document.getElementById("lightPos2").oninput =function() {
-        lightPos[1] = this.value/100;
+        lightPos[1] = this.value/10;
     };
 
     document.getElementById("lightPos3").oninput =function() {
-        lightPos[2] = this.value/100;
+        lightPos[2] = this.value/10;
     };
 
 
@@ -355,6 +388,12 @@ window.onload = function() {
                     gl.disable(gl.CULL_FACE);
                     backCulling=false;
                 }
+                break;
+            case 'l':
+                if(lightOff)
+                    lightOff=0;
+                else
+                    lightOff=1;
                 break;
         }   
     }
@@ -453,6 +492,7 @@ function uniforms(){
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(mNormals));
     gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(mViewNormals));
     gl.uniform1f(shininessLoc, shininess);
+    gl.uniform1f(lightOffLoc, lightOff);
     gl.uniform3fv(lightAmbLoc, lightAmb);
     gl.uniform3fv(lightDifLoc, lightDif);
     gl.uniform3fv(lightSpeLoc, lightSpe);
