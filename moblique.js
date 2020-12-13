@@ -168,42 +168,8 @@ function ortogonal(){
 }
 
 
-window.onload = function() {
-    var canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if(!gl) { alert("WebGL isn't available"); }
+function axo(){
     
-    // Configure WebGL
-    gl.viewport(0,0,canvas.width, canvas.height);
-    gl.clearColor(0, 0, 0, 1.0);
-
-    // Load shaders and initialize attribute buffers
-    program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
-
-    locs();
-
-
-    gl.canvas.onmousedown = mousedown;
-    gl.canvas.onmouseup = mouseup;
-    gl.canvas.onmousemove = mousemove;
-
-    drawOnClick();
-
-    axonometrica(42,7);
-
-
-    ortogonal();
-
-
-
-    document.getElementById("switch").onchange=function() {
-        if(lightPos[3])
-            lightPos[3] = 0;
-        else
-            lightPos[3] = 1;
-    };
-
     document.getElementById("isometrica").onclick=function() {
         axonometrica(30,30);
     };
@@ -229,6 +195,12 @@ window.onload = function() {
         ga = this.value/100;
         livre(ga,te);
     };
+}
+
+
+function lightAndMaterial(){
+    
+
 
     document.getElementById("shininess").oninput =function() {
         shininess = this.value;
@@ -320,12 +292,55 @@ window.onload = function() {
         lightPos[2] = this.value/10;
     };
 
+}
 
+
+window.onload = function() {
+    var canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+    if(!gl) { alert("WebGL isn't available"); }
+    
+    // Configure WebGL
+    gl.viewport(0,0,canvas.width, canvas.height);
+    gl.clearColor(0, 0, 0, 1.0);
+
+    // Load shaders and initialize attribute buffers
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
+    gl.useProgram(program);
+
+    locs();
+
+
+    gl.canvas.onmousedown = mousedown;
+    gl.canvas.onmouseup = mouseup;
+    gl.canvas.onmousemove = mousemove;
+
+    drawOnClick();
+
+    axonometrica(42,7);
+
+    ortogonal();
+
+    axo();
+
+    
     document.getElementById("perspetiva").onclick=function() {
         eye = [1,0,0];
         at = [0,0,0];
         up = [0,0,1/9.9]; 
     };
+
+    lightAndMaterial();
+
+
+    document.getElementById("switch").onchange=function() {
+        if(lightPos[3])
+            lightPos[3] = 0;
+        else
+            lightPos[3] = 1;
+    };
+
+
 
     $("[value='ortogonal'").click(function() {
         $(".axonometrica").hide();
@@ -363,7 +378,7 @@ window.onload = function() {
 
 
     document.onkeydown = function(event) {
-        switch(event.key) {
+        switch(event.key.toLowerCase()) {
             case 'w':
                 mode = WIRED;
                 break;     
@@ -384,6 +399,7 @@ window.onload = function() {
                 if(!backCulling){
                     gl.enable(gl.CULL_FACE);
                     backCulling=true;
+                    gl.cullFace(gl.BACK);
                 }
                 else{
                     gl.disable(gl.CULL_FACE);
@@ -421,17 +437,12 @@ function drawPrimitive(primitive){
 function axonometrica(f,s){
     var A = radians(f);
     var B = radians(s);
-
-
     var gama= Math.asin(Math.sqrt(Math.tan(A)*Math.tan(B)));
     var teta= Math.atan(Math.sqrt(Math.tan(A)/Math.tan(B))) - (Math.PI/2);
-
     var cg = Math.cos(gama);
     var ct = Math.cos(teta);
     var sg = Math.sin(gama);
     var st = Math.sin(teta);
-
-
     eye=vec3(-cg*st, sg, cg*ct);
     at = vec3(0.0, 0.0,0.0);
     up=vec3(st*sg, cg, -ct*sg);
@@ -442,7 +453,6 @@ function livre(gama,teta){
     var ct = Math.cos(teta);
     var sg = Math.sin(gama);
     var st = Math.sin(teta);
-
     eye=vec3(-cg*st, sg, cg*ct);
     at = vec3(0.0, 0.0,0.0);
     up=vec3(st*sg, cg, -ct*sg);
@@ -452,14 +462,15 @@ function livre(gama,teta){
 
 
 function mousedown(event) {
-    oldX = event.clientX;
-    oldY = event.clientY;
-    var rect = event.target.getBoundingClientRect();
-    // If we're within the rectangle, mouse is down within canvas.
-    if (rect.left <= oldX && oldX < rect.right && rect.top <= oldY && oldY < rect.bottom) {
-        event.clientX = oldX;
-        event.clientY = oldY;
-        drag = true;
+    if ($('#perspetiva').is(":checked")) {
+        oldX = event.clientX;
+        oldY = event.clientY;
+        var rect = event.target.getBoundingClientRect();
+        if (rect.left <= oldX && oldX < rect.right && rect.top <= oldY && oldY < rect.bottom) {
+            event.clientX = oldX;
+            event.clientY = oldY;
+            drag = true;
+        }
     }
   }
 
@@ -468,21 +479,14 @@ function mousedown(event) {
   }
 
   function mousemove(event) {
-    var x = event.clientX;
+    var x = event.clientX;	
     var y = event.clientY;
     if (drag) {
-      // The rotation speed factor
-      // dx and dy here are how for in the x or y direction the mouse moved
-      angleX += 0.1 * (x - oldX);
-      angleY += 0.1 *  (y - oldY);
-
-      // update the latest angle
-      //angleX = Math.max(angleX, -Math.PI / 2 + 0.01);
-      //angleY = Math.min(angleY, Math.PI / 2 - 0.01);
+        angleX += 0.1 * (x - oldX);	
+        angleY += 0.1 *  (y - oldY);
+        oldX = x;	
+        oldY = y;
     }
-
-    oldX = x;
-    oldY = y;
   }
 
 
